@@ -13,11 +13,11 @@ services:
       --init-connect='SET NAMES utf8mb4'
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./../recipe-management-system/sample_data_simple.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - /opt/recipe-management-system/sample_data_simple.sql:/docker-entrypoint-initdb.d/01-init.sql
     restart: unless-stopped
 
   backend:
-    build: ./../recipe-management-system
+    build: /opt/recipe-management-system
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
@@ -30,7 +30,7 @@ services:
 
   frontend:
     build:
-      context: ./../recipe-frontend/RecipeWebApp
+      context: /opt/recipe-frontend/RecipeWebApp
       dockerfile: Dockerfile.demo
     depends_on:
       - backend
@@ -41,7 +41,8 @@ services:
   caddy:
     image: caddy:2
     ports:
-      - "8088:8088"
+      - "80:80"
+      - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
